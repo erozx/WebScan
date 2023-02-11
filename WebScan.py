@@ -977,6 +977,9 @@ class dorkscan():
 
       nm = re.sub("[*:/<>?|=.~!@#$%^&(); ]", "_", _dork)
       mn = nm.replace("\ ", "")
+      mn1 = mn.replace("'", "")
+      mn2 = mn1.replace('"', "")
+      nm = mn2
       if _scan == "y":
         if _dork != None:
           _ = crawl(_dork, proxy=proxy)
@@ -1234,16 +1237,14 @@ Error: {err}\n\n"""
           if urls != []:
             for url in list(set(urls)):
               try:
-                adm = 0
                 nml = 0
                 for adm in admfound:
                   if adm in url:
                     print(loginfound + P + ' {}'.format(url))
-                    text = "\nUrl: {}".format(url)
+                    text = "\n{}".format(url)
                     temp = open("./.temp/" + filetemp2, "a+")
                     temp.writelines(text)
                     temp.close()
-                    adm = 1
                     nml = 1
                     break
                   time.sleep(0.005)
@@ -1257,7 +1258,17 @@ Error: {err}\n\n"""
                   break
 
               except KeyboardInterrupt:
-                if os.path.exists("./.temp/" + filetemp):
+                  #admnm = urlparse(url).hostname
+                if os.path.exists("./.temp/" + filetemp2):
+                    removeDups(filetemp2)
+                    c = open("./.temp/" + filetemp2, "r")
+                    name = "./output/adminfind/" + nm + ".txt"
+                    content = c.read()
+                    c.close()
+                    os.remove("./.temp/" + filetemp2)
+                    save_file(name, content, 3)
+
+                elif os.path.exists("./.temp/" + filetemp):
                   removeDups(filetemp)
                   c = open("./.temp/" + filetemp, "r")
                   name = "./output/dorkscan/" + nm + ".txt"
@@ -1268,20 +1279,17 @@ Error: {err}\n\n"""
                 else:
                   input(f"\n{fail}{BO} Nothing is Saved!")
 
-                if (adm == 1):
-                  #admnm = urlparse(url).hostname
-                  if os.path.exists("./.temp/" + filetemp2):
-                    removeDups(filetemp2)
-                    c = open("./.temp/" + filetemp2, "r")
-                    name = "./output/adminfind/" + nm + ".txt"
-                    content = c.read()
-                    c.close()
-                    os.remove("./.temp/" + filetemp2)
-                    save_file(name, content, 3)
-                  else:
-                    input(f"\n{fail}{BO} Nothing is Saved!")
+              #admnm = urlparse(url).hostname
+            if os.path.exists("./.temp/" + filetemp2):
+                removeDups(filetemp2)
+                c = open("./.temp/" + filetemp2, "r")
+                name = "./output/adminfind/" + nm + ".txt"
+                content = c.read()
+                c.close()
+                os.remove("./.temp/" + filetemp2)
+                save_file(name, content, 3)
 
-            if os.path.exists("./.temp/" + filetemp):
+            elif os.path.exists("./.temp/" + filetemp):
               removeDups(filetemp)
               c = open("./.temp/" + filetemp, "r")
               name = "./output/dorkscan/" + nm + ".txt"
@@ -1291,19 +1299,6 @@ Error: {err}\n\n"""
               save_file(name, content, 1)
             else:
               input(f"\n{fail}{BO} Nothing is Saved!")
-
-            if (adm == 1):
-              #admnm = urlparse(url).hostname
-              if os.path.exists("./.temp/" + filetemp2):
-                removeDups(filetemp2)
-                c = open("./.temp/" + filetemp2, "r")
-                name = "./output/adminfind/" + nm + ".txt"
-                content = c.read()
-                c.close()
-                os.remove("./.temp/" + filetemp2)
-                save_file(name, content, 3)
-              else:
-                input(f"\n{fail}{BO} Nothing is Saved!")
 
           else:
             input(f'\n{fail}{BR} No Url Found, Nothing is Saved!')
@@ -1364,7 +1359,7 @@ class crawler():
             link = urljoin(s_url, link)
             if "admin" in link or "login" in link:
               print(f"{loginfound}{BG} {link}")
-              text = "\nUrl: {}".format(link)
+              text = "\n{}".format(link)
               temp = open("./.temp/" + filetemp2, "a+")
               temp.writelines(text)
               temp.close()
@@ -1450,7 +1445,7 @@ class crawler():
               link = urljoin(s_url, link)
               if "admin" in link or "login" in link:
                 print(f"{loginfound}{BG} {link}")
-                text = "\nUrl: {}".format(link)
+                text = "\n{}".format(link)
                 temp = open("./.temp/" + filetemp2, "a+")
                 temp.writelines(text)
                 temp.close()
