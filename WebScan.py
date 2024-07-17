@@ -1,11 +1,4 @@
 #!/usr/bin/python
-'''
-Nama: Surya Hadini S
-Kelas: XI TKJ-2
-Judul Laporan: Menganalisis Kerentanan Website Menggunakan Scanner Python
-Tujuan Project: Untuk memenuhi tugas Laporan PKL
-Nama Program: WebScan (Website Scanner)
-'''
 import sys, os, re, io
 
 # Color [ANSI] ==========================================
